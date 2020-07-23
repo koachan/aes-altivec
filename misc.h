@@ -137,27 +137,6 @@ unslice(vu8 output[8], vu8 const input[8]) {
 }
 
 static inline u32
-from_u8(u8 a, u8 b, u8 c, u8 d) {
-    return ((u32) a) << 24 |
-           ((u32) b) << 16 |
-           ((u32) c) <<  8 |
-           ((u32) d);
-}
-
-static inline void
-to_u8(u8 v[4], u32 a) {
-    v[0] = (u8) (a >> 24);
-    v[1] = (u8) (a >> 16);
-    v[2] = (u8) (a >>  8);
-    v[3] = (u8) a;
-}
-
-static inline u32
-rot_word(u32 w) {
-    return (w << 8) | (w >> 24);
-}
-
-static inline u32
 sub_word(u32 w) {
     vu32 v = vec_splats(w);
     vu8 x[8] = EXPAND8((vu8) v);

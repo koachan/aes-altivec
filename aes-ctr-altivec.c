@@ -65,67 +65,8 @@ increment_iv(vu8 iv[8]) {
     }
 }
 
-static void
-test(vu8 b[8], u8 k[16]) {
-    ECRYPT_ctx c;
-
-    printf("b\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(b[i]);
-    }
-    printf("\n");
-
-    slice(b, b);
-    printf("b sliced\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(b[i]);
-    }
-    printf("\n");
-
-    printf("k\n");
-    for (int i=0; i<16; i++) {
-        printf("%02x ", k[i]);
-    }
-    printf("\n\n");
-
-    ECRYPT_keysetup(&c, k, 16, 16);
-    printf("rk unsliced\n");
-    for (int i=0; i<11; i++) {
-        vu8 rk[8];
-        unslice(rk, (c.rk + i*8));
-        print_vu8(rk[0]);
-    }
-    printf("\n");
-
-    aes_encrypt_sliced(&c, b, b);
-    printf("enc(b, k) sliced\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(b[i]);
-    }
-    printf("\n");
-
-    unslice(b, b);
-    printf("enc(b, k) unsliced\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(b[i]);
-    }
-    printf("\n");
-}
-
 void
 ECRYPT_init(void) {
-    ECRYPT_ctx c;
-
-    u8 b[16] = {0}; ECRYPT_ivsetup(&c, b);
-
-    u8 k[16] = {0x80, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00};
-
-    //test(c.iv, k);
-    //exit(0);
-
     return;
 }
 
@@ -143,7 +84,7 @@ ECRYPT_keysetup(ECRYPT_ctx *c, const u8 *k, u32 keysize, u32 ivsize) {
 
     int i;
     for (i = 4; i < 44; i+=4) {
-        rk[i]     = rk[i - 4] ^ sub_word(rot_word(rk[i - 1])) ^ rcon[i / 4];
+        rk[i]     = rk[i - 4] ^ sub_word(ROTL32(rk[i - 1], 8)) ^ rcon[i / 4];
         rk[i + 1] = rk[i - 3] ^ rk[i];
         rk[i + 2] = rk[i - 2] ^ rk[i + 1];
         rk[i + 3] = rk[i - 1] ^ rk[i + 2];
