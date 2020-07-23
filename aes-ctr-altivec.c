@@ -121,30 +121,33 @@ test(vu8 b[8], vu8 k[8]) {
     printf("\n");
 }
 
-/* static void
-test_expand(u8 k[8]) {
+static void
+test_expand(u8 k[16]) {
     ECRYPT_ctx c;
+    vu8 uk[88];
 
     printf("k\n");
     for (int i=0; i<8; i++) {
         printf("%02x ", k[i]);
     }
-    printf("\n");
+    printf("\n\n");
 
-    ECRYPT_keysetup(&c, k, 16, 16)
+    ECRYPT_keysetup(&c, k, 16, 16);
     printf("keysetup(k) sliced\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(b[i]);
+    for (int i=0; i<88; i++) {
+        print_vu8(c.rk[i]);
     }
     printf("\n");
 
-    unslice(b, b);
-    printf("round(b) unsliced\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(b[i]);
+    printf("keysetup(k) unsliced\n");
+    for (int i=0; i<11; i++) {
+        unslice(uk + i*8, c.rk + i*8);
+    }
+    for (int i=0; i<88; i++) {
+        print_vu8(uk[i]);
     }
     printf("\n");
-} */
+}
 
 void
 ECRYPT_init(void) {

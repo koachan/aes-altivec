@@ -8,7 +8,8 @@
 
 #define EXPAND8(x) {(x), (x), (x), (x), (x), (x), (x), (x)}
 
-static const u32 rcon[10] = {
+static const u32 rcon[11] = {
+    0xffffffff, /* undefined */
     0x01000000,
     0x02000000,
     0x04000000,
