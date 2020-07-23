@@ -65,21 +65,9 @@ increment_iv(vu8 iv[8]) {
 }
 
 static void
-print_vu8(vu8 v) {
-    union {
-        vu8 v;
-        u8  u[16];
-    } uni;
+test(vu8 b[8], u8 k[16]) {
+    ECRYPT_ctx c;
 
-    uni.v = v;
-    for (int i=0; i<16; i++) {
-        printf("%02x ", uni.u[i]);
-    }
-    printf("\n");
-}
-
-static void
-test(vu8 b[8], vu8 k[8]) {
     printf("b\n");
     for (int i=0; i<8; i++) {
         print_vu8(b[i]);
@@ -94,86 +82,49 @@ test(vu8 b[8], vu8 k[8]) {
     printf("\n");
 
     printf("k\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(k[i]);
+    for (int i=0; i<16; i++) {
+        printf("%02x ", k[i]);
+    }
+    printf("\n\n");
+
+    ECRYPT_keysetup(&c, k, 16, 16);
+    printf("rk unsliced\n");
+    for (int i=0; i<11; i++) {
+        vu8 rk[8];
+        unslice(rk, (c.rk + i*8));
+        print_vu8(rk[0]);
     }
     printf("\n");
 
-    slice(k, k);
-    printf("k sliced\n");
-    for (int i=0; i<8; i++) {
-        print_vu8(k[i]);
-    }
-    printf("\n");
-
-    aes_enc(b, k);
-    printf("round(b) sliced\n");
+    aes_encrypt_sliced(&c, b, b);
+    printf("enc(b, k) sliced\n");
     for (int i=0; i<8; i++) {
         print_vu8(b[i]);
     }
     printf("\n");
 
     unslice(b, b);
-    printf("round(b) unsliced\n");
+    printf("enc(b, k) unsliced\n");
     for (int i=0; i<8; i++) {
         print_vu8(b[i]);
     }
     printf("\n");
 }
 
-static void
-test_expand(u8 k[16]) {
-    ECRYPT_ctx c;
-    vu8 uk[88];
-
-    printf("k\n");
-    for (int i=0; i<8; i++) {
-        printf("%02x ", k[i]);
-    }
-    printf("\n\n");
-
-    ECRYPT_keysetup(&c, k, 16, 16);
-    printf("keysetup(k) sliced\n");
-    for (int i=0; i<88; i++) {
-        print_vu8(c.rk[i]);
-    }
-    printf("\n");
-
-    printf("keysetup(k) unsliced\n");
-    for (int i=0; i<11; i++) {
-        unslice(uk + i*8, c.rk + i*8);
-    }
-    for (int i=0; i<88; i++) {
-        print_vu8(uk[i]);
-    }
-    printf("\n");
-}
-
 void
 ECRYPT_init(void) {
-    // 00 10 20 30 40 50 60 70 80 90 a0 b0 c0 d0 e0 f0
-    vu8 vb = {0x00, 0x10, 0x20, 0x30,
-              0x40, 0x50, 0x60, 0x70,
-              0x80, 0x90, 0xa0, 0xb0,
-              0xc0, 0xd0, 0xe0, 0xf0};
+    vu8 vb = {0x00, 0x11, 0x22, 0x33,
+              0x44, 0x55, 0x66, 0x77,
+              0x88, 0x99, 0xaa, 0xbb,
+              0xcc, 0xdd, 0xee, 0xff};
     vu8 b[8] = EXPAND8(vb);
 
-    // d6 aa 74 fd d2 af 72 fa da a6 78 f1 d6 ab 76 fe
-    vu8 vk = {0xd6, 0xaa, 0x74, 0xfd,
-              0xd2, 0xaf, 0x72, 0xfa,
-              0xda, 0xa6, 0x78, 0xf1,
-              0xd6, 0xab, 0x76, 0xfe};
-    vu8 k[8] = EXPAND8(vk);
-
-    u8  bk[16] = {0x00, 0x01, 0x02, 0x03,
-                  0x04, 0x05, 0x06, 0x07,
-                  0x08, 0x09, 0x0a, 0x0b,
-                  0x0c, 0x0d, 0x0e, 0x0f};
-
-    // memset(b, 0xFF, 128);
+    u8 k[16] = {0x00, 0x01, 0x02, 0x03,
+                0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0a, 0x0b,
+                0x0c, 0x0d, 0x0e, 0x0f};
 
     //test(b, k);
-    //test_expand(bk);
     //exit(0);
 
     return;
@@ -205,7 +156,7 @@ ECRYPT_keysetup(ECRYPT_ctx *c, const u8 *k, u32 keysize, u32 ivsize) {
         (vu32) { rk[8],  rk[9], rk[10], rk[11]},
         (vu32) {rk[12], rk[13], rk[14], rk[15]},
         (vu32) {rk[16], rk[17], rk[18], rk[19]},
-        (vu32) {rk[20], rk[21], rk[42], rk[43]},
+        (vu32) {rk[20], rk[21], rk[22], rk[23]},
         (vu32) {rk[24], rk[25], rk[26], rk[27]},
         (vu32) {rk[28], rk[29], rk[30], rk[31]},
         (vu32) {rk[32], rk[33], rk[34], rk[35]},

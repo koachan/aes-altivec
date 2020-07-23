@@ -133,6 +133,29 @@ add_round_key(vu8 x[8], vu8 const k[8]) {
     }
 }
 
+static void
+print_vu8(vu8 v) {
+    union {
+        vu8 v;
+        u8  u[16];
+    } uni;
+
+    uni.v = v;
+    for (int i=0; i<16; i++) {
+        printf("%02x ", uni.u[i]);
+    }
+    printf("\n");
+}
+
+static inline void
+unslice(vu8 output[8], vu8 const input[8]);
+static void
+print_state(vu8 const x[8]) {
+    vu8 y[8];
+    unslice(y, x);
+    print_vu8(y[0]);
+}
+
 static inline void
 aes_enc(vu8 x[8], vu8 const k[8]) {
     sub_bytes(x);
