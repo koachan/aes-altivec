@@ -56,7 +56,8 @@ aes_encrypt_sliced(ECRYPT_ctx *c, vu8 output[8], vu8 const input[8]) {
 
 static void
 increment_iv(vu8 iv[8]) {
-    vu32 eight = {0, 0, 0, 8};
+    /* Use little-endian byte ordering to make it work like the benchmark implementations */
+    vu32 eight = {0x08000000, 0, 0, 0};
 
     int i;
     for (i = 0; i < 8; i++) {
@@ -113,18 +114,16 @@ test(vu8 b[8], u8 k[16]) {
 
 void
 ECRYPT_init(void) {
-    vu8 vb = {0x00, 0x11, 0x22, 0x33,
-              0x44, 0x55, 0x66, 0x77,
-              0x88, 0x99, 0xaa, 0xbb,
-              0xcc, 0xdd, 0xee, 0xff};
-    vu8 b[8] = EXPAND8(vb);
+    ECRYPT_ctx c;
 
-    u8 k[16] = {0x00, 0x01, 0x02, 0x03,
-                0x04, 0x05, 0x06, 0x07,
-                0x08, 0x09, 0x0a, 0x0b,
-                0x0c, 0x0d, 0x0e, 0x0f};
+    u8 b[16] = {0}; ECRYPT_ivsetup(&c, b);
 
-    //test(b, k);
+    u8 k[16] = {0x80, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00};
+
+    //test(c.iv, k);
     //exit(0);
 
     return;
@@ -137,10 +136,10 @@ ECRYPT_keysetup(ECRYPT_ctx *c, const u8 *k, u32 keysize, u32 ivsize) {
 
     u32 rk[44];
 
-    rk[0] = from_u8( k[0],  k[1],  k[2],  k[3]);
-    rk[1] = from_u8( k[4],  k[5],  k[6],  k[7]);
-    rk[2] = from_u8( k[8],  k[9], k[10], k[11]);
-    rk[3] = from_u8(k[12], k[13], k[14], k[15]);
+    rk[0] = U8TO32_BIG(k);
+    rk[1] = U8TO32_BIG(k + 4);
+    rk[2] = U8TO32_BIG(k + 8);
+    rk[3] = U8TO32_BIG(k + 12);
 
     int i;
     for (i = 4; i < 44; i+=4) {
@@ -173,8 +172,9 @@ ECRYPT_keysetup(ECRYPT_ctx *c, const u8 *k, u32 keysize, u32 ivsize) {
 
 void
 ECRYPT_ivsetup(ECRYPT_ctx *c, const u8 *iv) {
+    /* Use little-endian byte ordering to make it work like the benchmark implementations */
     vu8 base = {iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7], iv[8], iv[9], iv[10], iv[11], iv[12], iv[13], iv[14], iv[15]};
-    vu8 plus = {    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,      0,      0,      0,      0,      0,      1};
+    vu8 plus = {    1,     0,     0,     0,     0,     0,     0,     0,     0,     0,      0,      0,      0,      0,      0,      0};
 
     c->iv[0] = base;
     c->iv[1] = vec_add(c->iv[0], plus);
