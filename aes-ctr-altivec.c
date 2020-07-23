@@ -57,11 +57,15 @@ aes_encrypt_sliced(ECRYPT_ctx *c, vu8 output[8], vu8 const input[8]) {
 static void
 increment_iv(vu8 iv[8]) {
     /* Use little-endian byte ordering to make it work like the benchmark implementations */
-    vu32 eight = {0x08000000, 0, 0, 0};
+    vu32 eight = {8, 0, 0, 0};
+    vu8 swap   = {3, 2, 1, 0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
     int i;
     for (i = 0; i < 8; i++) {
-        iv[i] = (vu8) vec_add((vu32) iv[i], eight);
+        vu32 swapped = (vu32) vec_perm(iv[i], iv[i], swap);
+        vu8 added    = (vu8)  vec_add(swapped, eight);
+
+        iv[i] = (vu8) vec_perm(added, added, swap);
     }
 }
 
