@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include "aes-round.h"
+#include "const.h"
 #include "ecrypt-sync.h"
 #include "misc.h"
 
@@ -57,9 +58,6 @@ aes_encrypt_sliced(ECRYPT_ctx *c, vu8 output[8], vu8 const input[8]) {
 static void
 increment_iv(vu8 iv[8]) {
     /* Use little-endian byte ordering to make it work like the benchmark implementations */
-    vu32 eight = {8, 0, 0, 0};
-    vu8 swap   = {3, 2, 1, 0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-
     int i;
     for (i = 0; i < 8; i++) {
         vu32 swapped = (vu32) vec_perm(iv[i], iv[i], swap);
@@ -119,16 +117,15 @@ void
 ECRYPT_ivsetup(ECRYPT_ctx *c, const u8 *iv) {
     /* Use little-endian byte ordering to make it work like the benchmark implementations */
     vu8 base = {iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7], iv[8], iv[9], iv[10], iv[11], iv[12], iv[13], iv[14], iv[15]};
-    vu8 plus = {    1,     0,     0,     0,     0,     0,     0,     0,     0,     0,      0,      0,      0,      0,      0,      0};
 
     c->iv[0] = base;
-    c->iv[1] = vec_add(c->iv[0], plus);
-    c->iv[2] = vec_add(c->iv[1], plus);
-    c->iv[3] = vec_add(c->iv[2], plus);
-    c->iv[4] = vec_add(c->iv[3], plus);
-    c->iv[5] = vec_add(c->iv[4], plus);
-    c->iv[6] = vec_add(c->iv[5], plus);
-    c->iv[7] = vec_add(c->iv[6], plus);
+    c->iv[1] = vec_add(c->iv[0], one);
+    c->iv[2] = vec_add(c->iv[1], one);
+    c->iv[3] = vec_add(c->iv[2], one);
+    c->iv[4] = vec_add(c->iv[3], one);
+    c->iv[5] = vec_add(c->iv[4], one);
+    c->iv[6] = vec_add(c->iv[5], one);
+    c->iv[7] = vec_add(c->iv[6], one);
 }
 
 void

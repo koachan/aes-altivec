@@ -4,23 +4,10 @@
 #include <altivec.h>
 
 #include "aes-round.h"
+#include "const.h"
 #include "ecrypt-sync.h"
 
 #define EXPAND8(x) {(x), (x), (x), (x), (x), (x), (x), (x)}
-
-static const u32 rcon[11] = {
-    0xffffffff, /* undefined */
-    0x01000000,
-    0x02000000,
-    0x04000000,
-    0x08000000,
-    0x10000000,
-    0x20000000,
-    0x40000000,
-    0x80000000,
-    0x1B000000,
-    0x36000000,
-};
 
 static inline void
 slice(vu8 output[8], vu8 const input[8]) {
@@ -30,13 +17,6 @@ slice(vu8 output[8], vu8 const input[8]) {
         v4 = input[4], v5 = input[5], v6 = input[6], v7 = input[7];
 
 	vu8 m = vec_splats((u8) 0x80);
-
-    vu8 rearrange = {
-        0, 4,  8, 12,
-        1, 5,  9, 13,
-        2, 6, 10, 14,
-        3, 7, 11, 15
-    };
 
 	vu8 t0, t1, t2, t3, t4, t5, t6, t7;
 
@@ -48,7 +28,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t0 = vec_or(t0, vec_sr(vec_and(v5, m), vec_splats((u8) 5)));
     t0 = vec_or(t0, vec_sr(vec_and(v6, m), vec_splats((u8) 6)));
     t0 = vec_or(t0, vec_sr(vec_and(v7, m), vec_splats((u8) 7)));
-    t0 = vec_perm(t0, t0, rearrange);
+    t0 = vec_perm(t0, t0, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t1 = vec_sl(vec_and(v0, m), vec_splats((u8) 1));
@@ -59,7 +39,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t1 = vec_or(t1, vec_sr(vec_and(v5, m), vec_splats((u8) 4)));
     t1 = vec_or(t1, vec_sr(vec_and(v6, m), vec_splats((u8) 5)));
     t1 = vec_or(t1, vec_sr(vec_and(v7, m), vec_splats((u8) 6)));
-    t1 = vec_perm(t1, t1, rearrange);
+    t1 = vec_perm(t1, t1, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t2 = vec_sl(vec_and(v0, m), vec_splats((u8) 2));
@@ -70,7 +50,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t2 = vec_or(t2, vec_sr(vec_and(v5, m), vec_splats((u8) 3)));
     t2 = vec_or(t2, vec_sr(vec_and(v6, m), vec_splats((u8) 4)));
     t2 = vec_or(t2, vec_sr(vec_and(v7, m), vec_splats((u8) 5)));
-    t2 = vec_perm(t2, t2, rearrange);
+    t2 = vec_perm(t2, t2, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t3 = vec_sl(vec_and(v0, m), vec_splats((u8) 3));
@@ -81,7 +61,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t3 = vec_or(t3, vec_sr(vec_and(v5, m), vec_splats((u8) 2)));
     t3 = vec_or(t3, vec_sr(vec_and(v6, m), vec_splats((u8) 3)));
     t3 = vec_or(t3, vec_sr(vec_and(v7, m), vec_splats((u8) 4)));
-    t3 = vec_perm(t3, t3, rearrange);
+    t3 = vec_perm(t3, t3, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t4 = vec_sl(vec_and(v0, m), vec_splats((u8) 4));
@@ -92,7 +72,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t4 = vec_or(t4, vec_sr(vec_and(v5, m), vec_splats((u8) 1)));
     t4 = vec_or(t4, vec_sr(vec_and(v6, m), vec_splats((u8) 2)));
     t4 = vec_or(t4, vec_sr(vec_and(v7, m), vec_splats((u8) 3)));
-    t4 = vec_perm(t4, t4, rearrange);
+    t4 = vec_perm(t4, t4, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t5 = vec_sl(vec_and(v0, m), vec_splats((u8) 5));
@@ -103,7 +83,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t5 = vec_or(t5, vec_and(v5, m));
     t5 = vec_or(t5, vec_sr(vec_and(v6, m), vec_splats((u8) 1)));
     t5 = vec_or(t5, vec_sr(vec_and(v7, m), vec_splats((u8) 2)));
-    t5 = vec_perm(t5, t5, rearrange);
+    t5 = vec_perm(t5, t5, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t6 = vec_sl(vec_and(v0, m), vec_splats((u8) 6));
@@ -114,7 +94,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t6 = vec_or(t6, vec_sl(vec_and(v5, m), vec_splats((u8) 1)));
     t6 = vec_or(t6, vec_and(v6, m));
     t6 = vec_or(t6, vec_sr(vec_and(v7, m), vec_splats((u8) 1)));
-    t6 = vec_perm(t6, t6, rearrange);
+    t6 = vec_perm(t6, t6, slice_rearrange);
     m = vec_sr(m, vec_splats((u8) 1));
 
     t7 = vec_sl(vec_and(v0, m), vec_splats((u8) 7));
@@ -125,7 +105,7 @@ slice(vu8 output[8], vu8 const input[8]) {
     t7 = vec_or(t7, vec_sl(vec_and(v5, m), vec_splats((u8) 2)));
     t7 = vec_or(t7, vec_sl(vec_and(v6, m), vec_splats((u8) 1)));
     t7 = vec_or(t7, vec_and(v7, m));
-    t7 = vec_perm(t7, t7, rearrange);
+    t7 = vec_perm(t7, t7, slice_rearrange);
 
     output[0] = t0; output[1] = t1; output[2] = t2; output[3] = t3;
     output[4] = t4; output[5] = t5; output[6] = t6; output[7] = t7;

@@ -3,14 +3,8 @@
 
 #include <altivec.h>
 
+#include "const.h"
 #include "ecrypt-sync.h"
-
-static const vu8 sr_const = {
-     0,  1,  2,  3,
-     5,  6,  7,  4,
-    10, 11,  8,  9,
-    15, 12, 13, 14,
-};
 
 static inline vu8
 vec_rl32(vu8 v) {
