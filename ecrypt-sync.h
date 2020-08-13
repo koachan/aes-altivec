@@ -10,11 +10,10 @@
 #ifndef ECRYPT_SYNC
 #define ECRYPT_SYNC
 
-#include <altivec.h>
 #include "ecrypt-portable.h"
 
-typedef vector unsigned char vu8;
-typedef vector unsigned int  vu32;
+typedef __vector unsigned char vu8;
+typedef __vector unsigned int  vu32;
 
 /* ------------------------------------------------------------------------- */
 

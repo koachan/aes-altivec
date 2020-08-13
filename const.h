@@ -1,6 +1,8 @@
 #ifndef CONST_H
 #define CONST_H
 
+#include <altivec.h>
+
 #include "ecrypt-sync.h"
 
 /* IV setup constant */
