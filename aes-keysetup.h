@@ -62,7 +62,7 @@ aes_key_expand_sliced(u32 rk[44], u8 const k[16]) {
 }
 /* End bitsliced implementation */
 
-/* Start lookup-table-based implementation
+/* Start lookup table-based implementation
  * This is still a naive implementation, could be improved more. */
 static inline u32
 sub_word_lookup(u32 w) {
@@ -94,8 +94,7 @@ aes_key_expand_lookup(u32 rk[44], u8 const k[16]) {
         rk[i + 3] = rk[i - 1] ^ rk[i + 2];
     }
 }
-
-/* End lookup-table-based implementation */
+/* End lookup table-based implementation */
 
 /* This is AES-128 only for now */
 static inline void

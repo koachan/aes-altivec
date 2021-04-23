@@ -19,24 +19,25 @@ use it at your own risk.
 Below is the comparison between my implementation and the benchmark
 implementation included in the testing framework:
 
-| Implementation    | Long Stream | 40 bytes  | 576 bytes | 1500 bytes | Imix      | Agility   | Key setup      | IV setup     |
-|-------------------|-------------|-----------|-----------|------------|-----------|-----------|----------------|--------------|
-| bernstein/big-1/1 | 21.86 cpb   | 32.90 cpb | 22.23 cpb | 22.08 cpb  | 22.90 cpb | 25.14 cpb | 200.80 cycles  | 17.10 cycles |
-| aes-altivec       | 16.01 cpb   | 56.00 cpb | 18.17 cpb | 16.56 cpb  | 20.17 cpb | 35.24 cpb | 4978.17 cycles | 58.03 cycles |
+| Implementation                                  | Long Stream | 40 bytes  | 576 bytes | 1500 bytes | Imix      | Agility   | Key setup      | IV setup     |
+|-------------------------------------------------|-------------|-----------|-----------|------------|-----------|-----------|----------------|--------------|
+| bernstein/big-1/1                               | 24.74 cpb   | 38.74 cpb | 25.25 cpb | 25.01 cpb  | 26.09 cpb | 28.11 cpb | 233.92 cycles  | 50.06 cycles |
+| aes-altivec                                     | 16.30 cpb   | 60.03 cpb | 18.69 cpb | 16.93 cpb  | 20.88 cpb | 35.78 cpb | 5152.13 cycles | 91.26 cycles |
+| aes-altivec (with lookup table-based key setup) | 16.30 cpb   | 59.98 cpb | 18.68 cpb | 16.92 cpb  | 20.87 cpb | 35.81 cpb | 2033.00 cycles | 91.06 cycles |
 
-All tests were done on a 1.4 Ghz Mac mini running OpenBSD 6.7 with
-the default Clang 8.0.1 compiler.
+All tests were done on a 1.4 GHz Mac mini running OpenBSD 6.8 with
+the default Clang 10.0.1 compiler.
 
 Some observations of the result:
-- This is already faster than the benchmark implementation in long (576+ bytes)
+- It's already faster than the benchmark implementation in longer (576+ bytes)
   encryption sessions.
 - Encryption on 40 byte packets are slow since my implementation operates on
-  128 byte blocks, so there's a lot of wasted things there.
-- Key setup is much slower than benchmark, this happens because the `sub_bytes`
-  function only accepts bitsliced input so there's a lot of possibly unnecessary
-  slicing/unslicing going on. \
-  K&S solves this by giving an alternate key setup function that uses normal
-  lookup table-based implementation.
+  128 byte blocks, so there's a lot of wasted computation.
+- In bitslicing mode, key setup is much slower, this happens because
+  the `sub_bytes` function only accepts bitsliced input so there's a lot
+  of possibly unnecessary slicing/unslicing going on. \
+  K&S proposed to solve this by using an normal key setup function
+  that uses lookup tables.
 - IV setup is slower since this needs to set up eight IVs at once.
 
 ### Things to do
