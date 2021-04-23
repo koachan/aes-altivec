@@ -1,6 +1,6 @@
 /* AES-CTR implementation with AltiVec, based on https://eprint.iacr.org/2009/129.
  *
- * Copyright (c) 2019 Koakuma
+ * Copyright (c) 2019 Koakuma <koachan@protonmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
