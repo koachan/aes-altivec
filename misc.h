@@ -26,7 +26,6 @@
 
 #include <altivec.h>
 
-#include "aes-round.h"
 #include "const.h"
 #include "ecrypt-sync.h"
 
@@ -137,16 +136,6 @@ slice(vu8 output[8], vu8 const input[8]) {
 static inline void
 unslice(vu8 output[8], vu8 const input[8]) {
     slice(output, input);
-}
-
-static inline u32
-sub_word(u32 w) {
-    vu32 v = vec_splats(w);
-    vu8 x[8] = EXPAND8((vu8) v);
-    slice(x, x);
-    sub_bytes(x);
-    unslice(x, x);
-    return vec_extract((vu32) x[0], 0);
 }
 
 #endif /* MISC_H */

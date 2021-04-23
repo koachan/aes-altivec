@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 
+#include "aes-keysetup.h"
 #include "aes-round.h"
 #include "const.h"
 #include "ecrypt-sync.h"
@@ -40,16 +41,16 @@ aes_encrypt_sliced(ECRYPT_ctx *c, vu8 output[8], vu8 const input[8]) {
     };
 
     add_round_key(ct, c->rk     );
-    aes_enc(      ct, c->rk + 8 );
-    aes_enc(      ct, c->rk + 16);
-    aes_enc(      ct, c->rk + 24);
-    aes_enc(      ct, c->rk + 32);
-    aes_enc(      ct, c->rk + 40);
-    aes_enc(      ct, c->rk + 48);
-    aes_enc(      ct, c->rk + 56);
-    aes_enc(      ct, c->rk + 64);
-    aes_enc(      ct, c->rk + 72);
-    aes_enc_last( ct, c->rk + 80);
+    aes_enc      (ct, c->rk + 8 );
+    aes_enc      (ct, c->rk + 16);
+    aes_enc      (ct, c->rk + 24);
+    aes_enc      (ct, c->rk + 32);
+    aes_enc      (ct, c->rk + 40);
+    aes_enc      (ct, c->rk + 48);
+    aes_enc      (ct, c->rk + 56);
+    aes_enc      (ct, c->rk + 64);
+    aes_enc      (ct, c->rk + 72);
+    aes_enc_last (ct, c->rk + 80);
 
     output[0] = ct[0]; output[1] = ct[1]; output[2] = ct[2]; output[3] = ct[3];
     output[4] = ct[4]; output[5] = ct[5]; output[6] = ct[6]; output[7] = ct[7];
@@ -74,23 +75,9 @@ ECRYPT_init(void) {
 
 void
 ECRYPT_keysetup(ECRYPT_ctx *c, const u8 *k, u32 keysize, u32 ivsize) {
-    /* Do it traditionally, then convert to bitsliced format.
-     * It's slow but at least it works. Need to improve this tho. */
-
     u32 rk[44];
 
-    rk[0] = U8TO32_BIG(k);
-    rk[1] = U8TO32_BIG(k + 4);
-    rk[2] = U8TO32_BIG(k + 8);
-    rk[3] = U8TO32_BIG(k + 12);
-
-    int i;
-    for (i = 4; i < 44; i+=4) {
-        rk[i]     = rk[i - 4] ^ sub_word(ROTL32(rk[i - 1], 8)) ^ rcon[i / 4];
-        rk[i + 1] = rk[i - 3] ^ rk[i];
-        rk[i + 2] = rk[i - 2] ^ rk[i + 1];
-        rk[i + 3] = rk[i - 1] ^ rk[i + 2];
-    }
+    aes_key_expand(rk, k);
 
     vu32 vrk[11] = {
         (vu32) { rk[0],  rk[1],  rk[2],  rk[3]},
@@ -106,6 +93,7 @@ ECRYPT_keysetup(ECRYPT_ctx *c, const u8 *k, u32 keysize, u32 ivsize) {
         (vu32) {rk[40], rk[41], rk[42], rk[43]},
     };
 
+    int i;
     for (i = 0; i < 11; i++) {
         vu8 srk[8] = EXPAND8((vu8) vrk[i]);
         slice(srk, srk);
