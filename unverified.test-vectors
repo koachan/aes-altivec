@@ -2338,8 +2338,8 @@ Test vectors -- set 7
 Set 7, vector#  0:
                          key = 00112233445566778899AABBCCDDEEFF
                           IV = 00000000000000000000000000000000
-                   plaintext = 
-                  ciphertext = 
+                   plaintext =
+                  ciphertext =
 
 Set 7, vector#  9:
                          key = 00112233445566778899AABBCCDDEEFF
@@ -2351,7 +2351,7 @@ Set 7, vector# 18:
                          key = 00112233445566778899AABBCCDDEEFF
                           IV = 00000000000000000000000000000000
                    plaintext = 000000000000000000000000000000000000
-                  ciphertext = FDE4FBAE4A09E020EFF722969F83832BFDE4
+                  ciphertext = FDE4FBAE4A09E020EFF722969F83832B141C
 
 Set 7, vector# 27:
                          key = 00112233445566778899AABBCCDDEEFF
@@ -2359,7 +2359,7 @@ Set 7, vector# 27:
                    plaintext = 00000000000000000000000000000000
                                0000000000000000000000
                   ciphertext = FDE4FBAE4A09E020EFF722969F83832B
-                               FDE4FBAE4A09E020EFF722
+                               141CB2193EAB67101D177F
 
 Set 7, vector# 36:
                          key = 00112233445566778899AABBCCDDEEFF
@@ -2369,7 +2369,7 @@ Set 7, vector# 36:
                                00000000
                   ciphertext = FDE4FBAE4A09E020EFF722969F83832B
                                141CB2193EAB67101D177FA95249C8CA
-                               FDE4FBAE
+                               DE63B7F2
 
 Set 7, vector# 45:
                          key = 00112233445566778899AABBCCDDEEFF
@@ -2379,7 +2379,7 @@ Set 7, vector# 45:
                                00000000000000000000000000
                   ciphertext = FDE4FBAE4A09E020EFF722969F83832B
                                141CB2193EAB67101D177FA95249C8CA
-                               FDE4FBAE4A09E020EFF722969F
+                               DE63B7F21D2A67D8B91953B9EA
 
 Set 7, vector# 54:
                          key = 00112233445566778899AABBCCDDEEFF
@@ -2391,7 +2391,7 @@ Set 7, vector# 54:
                   ciphertext = FDE4FBAE4A09E020EFF722969F83832B
                                141CB2193EAB67101D177FA95249C8CA
                                DE63B7F21D2A67D8B91953B9EA3BC26E
-                               FDE4FBAE4A09
+                               78C5CCBA10C7
 
 Set 7, vector# 63:
                          key = 00112233445566778899AABBCCDDEEFF
@@ -2403,7 +2403,7 @@ Set 7, vector# 63:
                   ciphertext = FDE4FBAE4A09E020EFF722969F83832B
                                141CB2193EAB67101D177FA95249C8CA
                                DE63B7F21D2A67D8B91953B9EA3BC26E
-                               FDE4FBAE4A09E020EFF722969F8383
+                               78C5CCBA10C7BFF05DBEE6CE8CCFF7
 
 Test vectors -- set 8
 =====================

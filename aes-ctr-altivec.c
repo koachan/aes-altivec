@@ -62,9 +62,8 @@ increment_iv(vu8 iv[8]) {
     int i;
     for (i = 0; i < 8; i++) {
         vu32 swapped = (vu32) vec_perm(iv[i], iv[i], swap);
-        vu8 added    = (vu8)  vec_add(swapped, eight);
-
-        iv[i] = (vu8) vec_perm(added, added, swap);
+        vu8  added   = (vu8)  vec_add(swapped, eight);
+        iv[i]        = (vu8) vec_perm(added, added, swap);
     }
 }
 
@@ -147,6 +146,8 @@ ECRYPT_process_bytes(int action, ECRYPT_ctx *c, const u8 *input, u8 *output, u32
     aes_encrypt_sliced(c, pad_sliced, iv_sliced);
     unslice(pad, pad_sliced);
 
+    increment_iv(c->iv);
+
     for (i = 0; i < 8; i++) {
         block_last.v[i] = pad[i];
     }
@@ -159,8 +160,9 @@ ECRYPT_process_bytes(int action, ECRYPT_ctx *c, const u8 *input, u8 *output, u32
         vec_st(tmp, i, output);
     }
 
-    u32 bytes_start = vec_start + (vec_count << 4);
-    for (i = bytes_start, j = 0; i < len; i++, j++) {
-        output[i] = input[i] ^ block_last.u[j];
+    u32 block_byte  = vec_count << 4;
+    u32 bytes_start = vec_start + block_byte;
+    for (i = bytes_start; i < len; i++, block_byte++) {
+        output[i] = input[i] ^ block_last.u[block_byte];
     }
 }
