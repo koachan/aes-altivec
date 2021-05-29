@@ -33,7 +33,7 @@
 #include "misc.h"
 
 /* Encrypt a single 8-block batch */
-static void
+static inline void
 aes_encrypt_sliced(ECRYPT_ctx *c, vu8 output[8], vu8 const input[8]) {
     vu8 ct[8] = {
         input[0], input[1], input[2], input[3],
@@ -56,7 +56,7 @@ aes_encrypt_sliced(ECRYPT_ctx *c, vu8 output[8], vu8 const input[8]) {
     output[4] = ct[4]; output[5] = ct[5]; output[6] = ct[6]; output[7] = ct[7];
 }
 
-static void
+static inline void
 increment_iv(vu8 iv[8]) {
     /* Use little-endian byte ordering to make it work like the benchmark implementations */
     int i;
